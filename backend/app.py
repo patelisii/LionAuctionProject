@@ -40,7 +40,7 @@ def login_attempt():
             return jsonify({"message": "Login successful"}), 200
         conn.commit()
     except sql.Error as error:
-        return jsonify({"message": "Error connecting to database: "}), 405
+        return jsonify({"message": "Error connecting to database"}), 405
     finally:
         if conn:
             conn.close()
