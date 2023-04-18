@@ -1,0 +1,22 @@
+.category-view {
+  display: flex;
+}
+
+.categories,
+.auction-listings {
+  list-style-type: none;
+  padding: 0;
+}
+
+.categories li,
+.auction-listings li {
+  cursor: pointer;
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.categories li:hover,
+.auction-listings li:hover {
+  background-color: #f0f0f0;
+}
