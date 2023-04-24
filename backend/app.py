@@ -75,7 +75,7 @@ def fetch_product_cat():
     print(f"Fetching auction listings for {category}...")
     listings = product_queries.get_products_by_category(category)
 
-    print(listings)
+    # print(listings)
     return jsonify(listings)
 
 @app.route('/get_topLevel_categories', methods=['GET'])
@@ -84,7 +84,7 @@ def top_cats():
     cats = product_queries.get_topLevel_categories()
     # cats is a list of category names
 
-    print(cats)
+    # print(cats)
     return cats
 
 @app.route('/get_child_categories', methods=['POST'])
@@ -94,8 +94,52 @@ def child_cats():
     print(f"Fetching child categories for {category}...")
     # cats is a list of category names
     cats = product_queries.get_child_categories(category)
-    print(cats)
+    # print(cats)
     return cats
+
+@app.route('/get_parent_category', methods=['POST'])
+def parent_cat():
+    data = request.get_json()
+    category = data['category']
+    print(f"Fetching parent category for {category}...")
+    parent = product_queries.get_parent(category)
+    # print(parent)
+    return parent
+
+@app.route('/get_seller_listings', methods=['POST'])
+def seller_listings():
+    data = request.get_json()
+    email = data['email']
+    listings = product_queries.get_seller_listings(email)
+    print(listings)
+    return jsonify(listings)
+
+@app.route("/update_auction_listing", methods=['POST'])
+def update_listing():
+    data = request.get_json()
+    listing_id = data['listing_id']
+    new_values = data['new_values']
+
+    try:
+        product_queries.update_auction_listing(listing_id, new_values)
+        return jsonify({"success": True, "message": "Auction listing updated successfully."}), 200
+    except Exception as e:
+        print(str(e))
+        return jsonify({"success": False, "message": "Failed to update auction listing."}), 500
+
+@app.route('/create_auction_listing', methods=['POST'])
+def create_listing():
+    data = request.get_json()
+    listing = data['listing']
+
+    try:
+        listing_id = product_queries.get_next_listing_id()
+        listing['Listing_ID'] = listing_id
+        product_queries.insert_auction_listing(listing)
+        return jsonify({"success": True, "message": "Auction listing created successfully.", "listing_id": listing_id}), 200
+    except Exception as e:
+        print(str(e))
+        return jsonify({"success": False, "message": "Failed to create auction listing."}), 500
 
 
 if __name__ == '__main__':

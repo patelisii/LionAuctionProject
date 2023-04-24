@@ -6,6 +6,8 @@ import './App.css';
 import MainScreen from "./components/Main";
 import UserContext from './components/UserContext';
 import Profile from "./components/Profile";
+import SellerListings from './components/SellerListings';
+
 
 function App() {
     const [userEmail, setUserEmail] = useState('');
@@ -19,6 +21,7 @@ function App() {
                     <Route path="/login" element={<LoginPage/>} />
                     <Route path="/main" element={<MainScreen/>} />
                     <Route path="/profile" element={<Profile/>} />
+                     <Route path="/seller-listings" element={<SellerListings />} />
                 </Routes>
             </div>
         </UserContext.Provider>
