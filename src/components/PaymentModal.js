@@ -8,7 +8,6 @@ const PaymentModal = ({ open, onClose, onSubmitPayment }) => {
   const [cardInfo, setCardInfo] = useState({ cardNumber: '', cardExpiry: '', cardCVV: '' });
   const {userEmail} = useContext(UserContext);
   const handlePaymentSubmit = () => {
-    // Call the onSubmitPayment function with the card details
     onSubmitPayment({
       cardNumber,
       cardExpiry,

@@ -33,7 +33,7 @@ const SellerListings = () => {
   }, [userEmail]);
 
   const fetchSellerListings = async (sellerEmail) => {
-    // Fetch the listings for the given seller from the Flask app
+    // Fetch the listings for the given seller from flask
     const response = await fetch('http://127.0.0.1:5000/get_seller_listings', {
       method: 'POST',
       headers: {

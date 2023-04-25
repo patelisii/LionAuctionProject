@@ -43,7 +43,7 @@
   padding: 10px;
   border: 1px solid #ccc;
   margin-bottom: 10px;
-  width: calc(33% - 20px); /* Adjust this value to control the number of items per row */
+  width: calc(33% - 20px);
 }
 
 .categories li:hover,
