@@ -90,8 +90,8 @@ const SellerListings = () => {
                   {listing.Status === 0
                       ? 'Inactive'
                       : listing.Status === 2
-                          ? 'Active'
-                          : 'Sold'}
+                          ? 'Sold'
+                          : 'Active'}
                 </td>
                 <td>
                   <button onClick={() => handleOpenModal(listing)}>Edit</button>
@@ -175,8 +175,8 @@ const SellerListings = () => {
               <InputLabel>Status</InputLabel>
               <Select value={editedListing.Status} name="Status" onChange={handleChange}>
                 <MenuItem value={0}>Inactive</MenuItem>
-                <MenuItem value={2}>Active</MenuItem>
-                <MenuItem value={3}>Sold</MenuItem>
+                <MenuItem value={1}>Active</MenuItem>
+                {/*<MenuItem value={2}>Sold</MenuItem>*/}
               </Select>
             </FormControl>
           </DialogContent>
@@ -241,9 +241,9 @@ const SellerListings = () => {
         <FormControl fullWidth margin="normal">
           <InputLabel>Status</InputLabel>
           <Select value={newListing.Status} name="Status" onChange={handleChange}>
-            <MenuItem value={0}>Inactive</MenuItem>
-            <MenuItem value={2}>Active</MenuItem>
-            <MenuItem value={3}>Sold</MenuItem>
+            {/*<MenuItem value={0}>Inactive</MenuItem>*/}
+            <MenuItem value={1}>Active</MenuItem>
+            {/*<MenuItem value={2}>Sold</MenuItem>*/}
           </Select>
         </FormControl>
       </DialogContent>

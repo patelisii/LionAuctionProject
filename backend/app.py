@@ -72,7 +72,6 @@ def get_user_data():
 def fetch_product_cat():
     data = request.get_json()
     category = data['category']
-    print(f"Fetching auction listings for {category}...")
     listings = product_queries.get_products_by_category(category)
 
     # print(listings)
@@ -80,18 +79,14 @@ def fetch_product_cat():
 
 @app.route('/get_topLevel_categories', methods=['GET'])
 def top_cats():
-    print("Fetching top categories...")
     cats = product_queries.get_topLevel_categories()
     # cats is a list of category names
-
-    # print(cats)
     return cats
 
 @app.route('/get_child_categories', methods=['POST'])
 def child_cats():
     data = request.get_json()
     category = data['category']
-    print(f"Fetching child categories for {category}...")
     # cats is a list of category names
     cats = product_queries.get_child_categories(category)
     # print(cats)
@@ -101,9 +96,7 @@ def child_cats():
 def parent_cat():
     data = request.get_json()
     category = data['category']
-    print(f"Fetching parent category for {category}...")
     parent = product_queries.get_parent(category)
-    # print(parent)
     return parent
 
 @app.route('/get_seller_listings', methods=['POST'])
@@ -111,7 +104,6 @@ def seller_listings():
     data = request.get_json()
     email = data['email']
     listings = product_queries.get_seller_listings(email)
-    print(listings)
     return jsonify(listings)
 
 @app.route("/update_auction_listing", methods=['POST'])
@@ -141,6 +133,92 @@ def create_listing():
         print(str(e))
         return jsonify({"success": False, "message": "Failed to create auction listing."}), 500
 
+@app.route("/get_highest_bid", methods=['POST'])
+def get_highest_bid():
+    data = request.get_json()
+    listing_id = data['Listing_ID']
+
+    try:
+        bid = product_queries.highest_bid(listing_id)
+
+        return jsonify(
+            {"success": True, "message": "Got highest bid", "bid": bid}), 200
+    except Exception as e:
+        print(str(e))
+        return jsonify({"success": False, "message": "Failed to get highest bid"}), 500
+
+
+@app.route("/get_all_bids", methods=['POST'])
+def get_all_bids():
+    data = request.get_json()
+    listing_id = data['Listing_ID']
+    try:
+        bids = product_queries.all_bids(listing_id)
+        return jsonify(
+            {"success": True, "message": "Got all bids", "bids": bids}), 200
+    except Exception as e:
+        print(str(e))
+        return jsonify({"success": False, "message": "Failed to get all bids"}), 500
+
+@app.route("/get_auction_details", methods=['POST'])
+def get_auction_details():
+    data = request.get_json()
+    listing_id = data['Listing_ID']
+    try:
+        listing = product_queries.auction_listing_by_id(listing_id)
+        return jsonify(
+            {"success": True, "message": "Got auction details", "listing": listing}), 200
+    except Exception as e:
+        print(str(e))
+        return jsonify({"success": False, "message": "Failed to get auction details"}), 500
+
+@app.route("/place_bid", methods=['POST'])
+def place_bid_route():
+    data = request.get_json()
+    bid = {
+        "Seller_Email": data["Seller_Email"],
+        "Listing_ID": data["Listing_ID"],
+        "Bidder_Email": data["Bidder_Email"],
+        "Bid_Price": data["Bid_Price"]
+    }
+
+    try:
+        result = product_queries.place_bid(bid)
+        if result == "Success":
+            return jsonify({"success": True, "message": "Bid placed successfully"}), 200
+        elif result == "Last Bid":
+            return jsonify({"success": True, "message": "Last Bid"}), 200
+        else:
+            return jsonify({"success": False, "message": result}), 400
+    except Exception as e:
+        print(str(e))
+        return jsonify({"success": False, "message": "Failed to place bid"}), 500
+
+@app.route("/get_credit_card", methods=['POST'])
+def get_credit_card_by_email():
+    data = request.get_json()
+    email = data["email"]
+    try:
+        card = product_queries.get_credit_card(email)
+        if card:
+            return jsonify({"success": True, "card": card}), 200
+        else:
+            return jsonify({"success": False, "message": "No credit card found"}), 404
+    except Exception as e:
+        print(str(e))
+        return jsonify({"success": False, "message": "Failed to fetch credit card"}), 500
+
+@app.route("/complete_transaction", methods=['POST'])
+def complete_transaction_bid():
+    data = request.get_json()
+    bid_id = data["bid_id"]
+
+    try:
+        product_queries.complete_transaction(bid_id)
+        return jsonify({"success": True, "message": "Transaction completed successfully"}), 200
+    except Exception as e:
+        print(str(e))
+        return jsonify({"success": False, "message": "Failed to complete transaction"}), 500
 
 if __name__ == '__main__':
     app.run()

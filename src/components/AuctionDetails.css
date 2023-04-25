@@ -1,0 +1,46 @@
+.auction-details {
+  width: 100%;
+  padding: 100px
+}
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.bids-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem auto;
+}
+
+.bids-table th,
+.bids-table td {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.bids-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.back-button {
+  position: absolute;
+  left:0;
+  margin-bottom: 1rem;
+  background-color: #f2f2f2;
+  border: 1px solid #ccc;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.bid-button{
+  padding: 20px;
+}
+
+.back-button:hover {
+  background-color: #e5e5e5;
+}

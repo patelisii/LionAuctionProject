@@ -25,12 +25,10 @@ def init_UserPass_table(file_path):
         # upload table to sql using Pandas to_sql
         users[["email", "password"]].to_sql("UserPass", con=conn, if_exists="append", index=False)
         conn.commit()
-
+        conn.close()
     except sql.Error as error:
         print(error)
-    finally:
-        if conn:
-            conn.close()
+
 
 
 def init_Bidders_table(file_path):
@@ -58,12 +56,10 @@ def init_Bidders_table(file_path):
         # upload table to sql using Pandas to_sql
         table.to_sql("Bidders", con=conn, if_exists="append", index=False)
         conn.commit()
-
+        conn.close()
     except sql.Error as error:
         print(error)
-    finally:
-        if conn:
-            conn.close()
+
 
 def init_Address_table(file_path):
     try:
@@ -112,6 +108,7 @@ def init_ZipCode_table(file_path):
         conn.commit()
         conn.close()
 
+
     except sql.Error as error:
         print(error)
 
@@ -137,12 +134,10 @@ def init_Sellers_table(file_path):
         # upload table to sql using Pandas to_sql
         table.to_sql("Sellers", con=conn, if_exists="append", index=False)
         conn.commit()
+        conn.close()
 
     except sql.Error as error:
         print(error)
-    finally:
-        if conn:
-            conn.close()
 
 def init_LocalVendors_table(file_path):
     try:
@@ -166,11 +161,9 @@ def init_LocalVendors_table(file_path):
         # upload table to sql using Pandas to_sql
         table.to_sql("LocalVendors", con=conn, if_exists="append", index=False)
         conn.commit()
+        conn.close()
     except sql.Error as error:
         print(error)
-    finally:
-        if conn:
-            conn.close()
 
 def init_Helpdesk_table(file_path):
     try:
@@ -191,11 +184,9 @@ def init_Helpdesk_table(file_path):
         # upload table to sql using Pandas to_sql
         table.to_sql("Helpdesk", con=conn, if_exists="append", index=False)
         conn.commit()
+        conn.close()
     except sql.Error as error:
         print(error)
-    finally:
-        if conn:
-            conn.close()
 
 def init_CreditCards_table(file_path):
     try:
@@ -220,11 +211,9 @@ def init_CreditCards_table(file_path):
         # upload table to sql using Pandas to_sql
         table.to_sql("CreditCards", con=conn, if_exists="append", index=False)
         conn.commit()
+        conn.close()
     except sql.Error as error:
         print(error)
-    finally:
-        if conn:
-            conn.close()
 
 def init_Bids_table(file_path):
     try:
@@ -250,11 +239,9 @@ def init_Bids_table(file_path):
         # upload table to sql using Pandas to_sql
         table.to_sql("Bids", con=conn, if_exists="append", index=False)
         conn.commit()
+        conn.close()
     except sql.Error as error:
         print(error)
-    finally:
-        if conn:
-            conn.close()
 
 def init_Auction_Listings_table(file_path):
     try:
@@ -284,11 +271,9 @@ def init_Auction_Listings_table(file_path):
         # upload table to sql using Pandas to_sql
         table.to_sql("Auction_Listings", con=conn, if_exists="append", index=False)
         conn.commit()
+        conn.close()
     except sql.Error as error:
         print(error)
-    finally:
-        if conn:
-            conn.close()
 
 def init_Categories_table(file_path):
     try:
@@ -308,11 +293,9 @@ def init_Categories_table(file_path):
         # upload table to sql using Pandas to_sql
         table.to_sql("Categories", con=conn, if_exists="append", index=False)
         conn.commit()
+        conn.close()
     except sql.Error as error:
         print(error)
-    finally:
-        if conn:
-            conn.close()
 
 
 def init_Ratings_table(file_path):
@@ -342,7 +325,6 @@ def init_Ratings_table(file_path):
     except sql.Error as error:
         print(error)
 
-
 def init_Requests_table(file_path):
     try:
         conn = sql.connect(database)
@@ -367,11 +349,9 @@ def init_Requests_table(file_path):
         # upload table to sql using Pandas to_sql
         table.to_sql("Requests", con=conn, if_exists="append", index=False)
         conn.commit()
+        conn.close()
     except sql.Error as error:
         print(error)
-    finally:
-        if conn:
-            conn.close()
 
 def init_Transactions_table(file_path):
     try:
@@ -398,33 +378,64 @@ def init_Transactions_table(file_path):
         # upload table to sql using Pandas to_sql
         table.to_sql("Transactions", con=conn, if_exists="append", index=False)
         conn.commit()
+        conn.close()
     except sql.Error as error:
         print(error)
-    finally:
-        if conn:
-            conn.close()
+
+
+def init_canceled_listings():
+    try:
+        conn = sql.connect(database)
+        cursor = conn.cursor()
+
+        # SQL query for creating user table
+        create_table = """CREATE TABLE Canceled_Listings (
+                        Listing_ID INT,
+                        Reason CHAR(120),
+                        FOREIGN KEY (Listing_ID) REFERENCES Auction_Listings (Listing_ID),
+                        PRIMARY KEY (Listing_ID));"""
+
+        cursor.execute(create_table)
+        conn.commit()
+
+        cursor.execute("""
+                    INSERT INTO Canceled_Listings (
+                        Listing_ID, Reason
+                    )
+                    VALUES (?, ?)
+                """, (
+            9999999, "Test entry"
+        ))
+        conn.commit()
+        conn.close()
+    except sql.Error as error:
+        print(error)
+
+
 
 if __name__ == "__main__":
     pass
     # user Tables
-    # init_UserPass_table(file_path="LionAuctionDataset-v5/Users.csv")
+    init_UserPass_table(file_path="LionAuctionDataset-v5/Users.csv")
     init_ZipCode_table(file_path="LionAuctionDataset-v5/Zipcode_info.csv")
     init_Address_table(file_path="LionAuctionDataset-v5/Address.csv")
-    # init_Bidders_table(file_path="LionAuctionDataset-v5/Bidders.csv")
-    # init_CreditCards_table(file_path="LionAuctionDataset-v5/Credit_Cards.csv")
-    # init_Sellers_table(file_path="LionAuctionDataset-v5/Sellers.csv")
-    # init_LocalVendors_table(file_path="LionAuctionDataset-v5/Local_Vendors.csv")
-    #
-    # # Auction tables
-    # init_Categories_table(file_path="LionAuctionDataset-v5/Categories.csv")
-    # init_Auction_Listings_table(file_path="LionAuctionDataset-v5/Auction_Listings.csv")
-    # init_Transactions_table(file_path="LionAuctionDataset-v5/Transactions.csv")
-    # init_Ratings_table(file_path="LionAuctionDataset-v5/Ratings.csv")
-    # init_Bids_table(file_path="LionAuctionDataset-v5/Bids.csv")
-    #
-    # # Helpdesk tables
-    # init_Helpdesk_table(file_path="LionAuctionDataset-v5/Helpdesk.csv")
-    # init_Requests_table(file_path="LionAuctionDataset-v5/Requests.csv")
+    init_Bidders_table(file_path="LionAuctionDataset-v5/Bidders.csv")
+    init_CreditCards_table(file_path="LionAuctionDataset-v5/Credit_Cards.csv")
+    init_Sellers_table(file_path="LionAuctionDataset-v5/Sellers.csv")
+    init_LocalVendors_table(file_path="LionAuctionDataset-v5/Local_Vendors.csv")
+
+    # Auction tables
+    init_Categories_table(file_path="LionAuctionDataset-v5/Categories.csv")
+    init_Auction_Listings_table(file_path="LionAuctionDataset-v5/Auction_Listings.csv")
+    init_Transactions_table(file_path="LionAuctionDataset-v5/Transactions.csv")
+    init_Ratings_table(file_path="LionAuctionDataset-v5/Ratings.csv")
+    init_Bids_table(file_path="LionAuctionDataset-v5/Bids.csv")
+    init_canceled_listings()
+
+    # Helpdesk tables
+    init_Helpdesk_table(file_path="LionAuctionDataset-v5/Helpdesk.csv")
+    init_Requests_table(file_path="LionAuctionDataset-v5/Requests.csv")
+
 
 
 

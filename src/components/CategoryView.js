@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './CategoryView.css';
+import AuctionDetails from './AuctionDetails';
 
 const CategoryView = ({ fetchAuctionListings }) => {
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
   const [auctionListings, setAuctionListings] = useState([]);
   const [parentCategory, setParentCategory] = useState(null);
+  const [selectedListingId, setSelectedListingId] = useState(null);
+  const [showAuctionDetails, setShowAuctionDetails] = useState(false);
 
   useEffect(() => {
     fetchTopLevelCategories().then((data) => {
@@ -55,39 +58,56 @@ const CategoryView = ({ fetchAuctionListings }) => {
     setParentCategory(parent);
   };
 
+  const handleAuctionItemClick = (listingId) => {
+    setSelectedListingId(listingId);
+    setShowAuctionDetails(true);
+  };
+   const handleBackButtonClick = () => {
+    setShowAuctionDetails(false);
+    setSelectedListingId(null);
+    handleCategoryClick(activeCategory)
+  };
+
+
   return (
     <div className="category-view">
-      <div className="categories-section">
-        <h2>{activeCategory=="Root" ? "Categories" : activeCategory}</h2>
-        {parentCategory && (
-        <button
-          className="back-to-parent"
-          onClick={() => handleCategoryClick(parentCategory)}
-        >
-          Back to {parentCategory}
-        </button>
+      {showAuctionDetails ? (
+        <AuctionDetails listingId={selectedListingId} onBackButtonClick={handleBackButtonClick} />
+      ) : (
+        <>
+          <div className="categories-section">
+            <h2>{activeCategory === "Root" ? "Categories" : activeCategory}</h2>
+            {parentCategory && (
+              <button
+                className="back-to-parent"
+                onClick={() => handleCategoryClick(parentCategory)}
+              >
+                Back to {parentCategory}
+              </button>
+            )}
+            <ul className="categories">
+              {categories.map((categoryName) => (
+                <li key={categoryName} onClick={() => handleCategoryClick(categoryName)}>
+                  {categoryName}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="auction-listings-section">
+            <h2 align={"left"}>Auction Listings</h2>
+            <ul className="auction-listings">
+              {auctionListings.map((listing) => (
+                <li key={listing.Listing_ID} onClick={() => handleAuctionItemClick(listing.Listing_ID)}>
+                  <h3>{listing.Auction_Title}</h3>
+                  <p>{listing.Product_Name}</p>
+                  <p>{listing.Product_Description}</p>
+                  <p>{listing.Seller_Email}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
       )}
-        <ul className="categories">
-          {categories.map((categoryName) => (
-            <li key={categoryName} onClick={() => handleCategoryClick(categoryName)}>
-              {categoryName}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="auction-listings-section">
-        <h2 align={"left"}>Auction Listings</h2>
-        <ul className="auction-listings">
-          {auctionListings.map((listing) => (
-            <li key={listing.Listing_ID}>
-              <h3>{listing.Auction_Title}</h3>
-              <p>{listing.Product_Name}</p>
-              <p>{listing.Product_Description}</p>
-              <p>{listing.Seller_Email}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 };

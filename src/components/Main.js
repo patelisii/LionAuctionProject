@@ -26,10 +26,9 @@ const MainScreen = () => {
 
   return (
     <div>
-      {/* Navigation bar */}
       <nav className="navbar">
         <h1>LionAuction</h1>
-        {["Seller", "Local Vendor"].includes(userType) && (
+        {["Seller", "Local Business"].includes(userType) && (
           <Link to="/seller-listings">
             <button className="seller-listings-btn">Seller Listings</button>
           </Link>
