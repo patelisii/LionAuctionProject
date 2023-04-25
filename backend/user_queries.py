@@ -1,6 +1,6 @@
 import sqlite3 as sql
 
-database = "lion-auction/backend/database.db"
+database = "backend/database.db"
 
 
 def get_profile_data(email, user_type):

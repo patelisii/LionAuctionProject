@@ -35,35 +35,12 @@ def get_seller_listings(sellerEmail):
 
     email = f"'{sellerEmail}'"
 
-    listings = pd.read_sql(f"SELECT * FROM Auction_Listings a WHERE a.Seller_Email={email} ORDER BY Status ASC;", conn)
+    listings = pd.read_sql(f"SELECT * FROM Auction_Listings a WHERE a.Seller_Email={email} AND a.Status!=0 ORDER BY Status ASC;", conn)
     return listings.to_dict(orient='records')
 
 def update_auction_listing(listing_id, new_values):
     conn = sql.connect(database)
     cursor = conn.cursor()
-
-    print("""UPDATE auction_listings
-        SET
-          Auction_Title = ?,
-          Product_Name = ?,
-          Product_Description = ?,
-          Category = ?,
-          Quantity = ?,
-          Reserve_Price = ?,
-          Max_bids = ?,
-          Status = ?
-        WHERE (Listing_ID, Seller_Email) = ?
-    """, (
-        new_values['Auction_Title'],
-        new_values['Product_Name'],
-        new_values['Product_Description'],
-        new_values['Category'],
-        new_values['Quantity'],
-        new_values['Reserve_Price'],
-        new_values['Max_bids'],
-        new_values['Status'],
-        listing_id,
-    ))
 
     cursor.execute("""
         UPDATE auction_listings
@@ -125,7 +102,7 @@ def insert_auction_listing(listing):
 def highest_bid(listing_id):
     conn = sql.connect(database)
     cursor = conn.cursor()
-    # TODO: check if no bids
+
     cursor.execute("SELECT Bid_ID, Seller_Email, Listing_ID, Bidder_Email, MAX(Bid_Price) as Bid_Price FROM Bids b WHERE b.Listing_ID = ?;", (listing_id, ))
     row = cursor.fetchone()
     max_bid = {"Bid_ID": row[0], "Seller_Email": row[1], "Listing_ID": row[2], "Bidder_Email": row[3], "Bid_Price": row[4]}
@@ -219,7 +196,7 @@ def place_bid(bid):
     listing = auction_listing_by_id(bid["Listing_ID"])
     bids = all_bids(bid["Listing_ID"])
     if listing["Max_bids"] == len(bids):
-        # TODO: Now make auction invalid regardless
+        # make auction invalid regardless
         soldListing = listing.copy()
         soldListing["Status"] = 0
         update_auction_listing(listing["Listing_ID"], soldListing)
@@ -236,8 +213,6 @@ def get_credit_card(email):
 
     conn.close()
 
-    print(card)
-    info = []
     exp = f'{card[3]}/{card[4]}'
     info = [card[1], exp, card[5]]
 
@@ -258,7 +233,7 @@ def get_next_transaction_id():
 def get_bid_by_id(bid_id):
     conn = sql.connect(database)
     cursor = conn.cursor()
-    # TODO: check if no bids
+
     cursor.execute(
         "SELECT Bid_ID, Seller_Email, Listing_ID, Bidder_Email, MAX(Bid_Price) as Bid_Price FROM Bids b WHERE b.Bid_ID = ?;",
         (bid_id,))
@@ -301,12 +276,44 @@ def complete_transaction(bid_id):
     soldListing["Status"] = 2
     update_auction_listing(listing["Listing_ID"], soldListing)
 
+def cancel_auction(listing_id, reason):
+    conn = sql.connect(database)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+                INSERT INTO Canceled_Listings (
+                    Listing_ID, Reason
+                )
+                VALUES (?, ?)
+            """, (
+        listing_id, reason
+    ))
+
+    conn.commit()
+    conn.close()
 
 
+def update_profile(email, newData):
+    conn = sql.connect(database)
+    cursor = conn.cursor()
 
+    cursor.execute("""
+            UPDATE Bidders
+            SET
+              first_name = ?,
+              last_name = ?,
+              gender = ?,
+              age = ?,
+              major = ?
+            WHERE email = ?
+        """, (
+        newData['firstName'],
+        newData['lastName'],
+        newData['gender'],
+        newData['age'],
+        newData['major'],
+        email,
+    ))
 
-
-newBid = {'Seller_Email': 'feeles4r@lsu.edu', 'Listing_ID': 10, 'Bidder_Email': 'arubertelli0@lsu.edu', 'Bid_Price': 100}
-print(place_bid(newBid))
-
-# complete_transaction(bid_id=1158)
+    conn.commit()
+    conn.close()

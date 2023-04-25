@@ -12,7 +12,7 @@ import product_queries
 app = Flask(__name__)
 CORS(app)
 
-database = "lion-auction/backend/database.db"
+database = "backend/database.db"
 
 @app.route('/login', methods=['POST'])
 def login_attempt():
@@ -219,6 +219,31 @@ def complete_transaction_bid():
     except Exception as e:
         print(str(e))
         return jsonify({"success": False, "message": "Failed to complete transaction"}), 500
+
+@app.route("/cancel_auction", methods=['POST'])
+def cancel_auc():
+    data = request.get_json()
+    listingID = data["Listing_ID"]
+    reason = data["reason"]
+    try:
+        product_queries.cancel_auction(listingID, reason)
+        return jsonify({"success": True, "message": "Transaction completed successfully"}), 200
+    except Exception as e:
+        print(str(e))
+        return jsonify({"success": False, "message": "Failed to complete transaction"}), 500
+
+@app.route('/update_profile', methods=['POST'])
+def update_profile():
+    data = request.get_json(force=True)
+    email = data['email']
+    updated_data = data['updatedData']
+
+    try:
+        product_queries.update_profile(email, updated_data)
+        return jsonify({"success": True, "message": "Updates user profile successfully"}), 200
+    except Exception as e:
+        print(str(e))
+        return jsonify({"success": False, "message": "Failed to update user profile"}), 500
 
 if __name__ == '__main__':
     app.run()

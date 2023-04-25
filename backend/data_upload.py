@@ -3,8 +3,7 @@ import sqlite3 as sql
 import hashlib
 
 database = "backend/database.db"
-userTable = "LionAuctionDataset-v5/Users.csv"
-bidderTable = "LionAuctionDataset-v5/Bidders.csv"
+
 
 def init_UserPass_table(file_path):
     try:

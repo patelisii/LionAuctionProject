@@ -44,7 +44,7 @@ const PaymentModal = ({ open, onClose, onSubmitPayment }) => {
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Complete Transaction</DialogTitle>
+      <DialogTitle>You've Won the Auction! Complete Transaction</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus

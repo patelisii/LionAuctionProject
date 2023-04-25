@@ -122,13 +122,20 @@ const SellerListings = () => {
 
   const EditListingModal = ({ open, handleClose, listing, setListings, listings }) => {
     const [editedListing, setEditedListing] = useState(listing);
+    const [showCancellationModal, setShowCancellationModal] = useState(false);
+    const [cancellationReason, setCancellationReason] = useState("");
 
     useEffect(() => {
     setEditedListing(listing);
   }, [listing]);
 
     const handleChange = (e) => {
-      setEditedListing({...editedListing, [e.target.name]: e.target.value});
+      if (e.target.name === "Status" && e.target.value === 0) {
+        setEditedListing({...editedListing, [e.target.name]: e.target.value});
+        handleOpenCancellationModal();
+      } else {
+        setEditedListing({...editedListing, [e.target.name]: e.target.value});
+      }
     };
 
     const handleSave = async () => {
@@ -151,42 +158,86 @@ const SellerListings = () => {
       }
     };
 
+    const handleCancelAuction = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:5000/cancel_auction', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({Listing_ID: listing.Listing_ID, reason: cancellationReason}),
+        });
+
+        if (response.ok) {
+          setEditedListing({...editedListing, Status: 0});
+          handleCloseCancellationModal();
+        } else {
+          handleCloseCancellationModal();
+          console.error('Failed to cancel auction');
+        }
+      }
+      catch {
+        handleCloseCancellationModal();
+      }
+    };
+
+    const handleOpenCancellationModal = () => {
+      setShowCancellationModal(true);
+      setCancellationReason("");
+    };
+
+    const handleCloseCancellationModal = () => {
+      setShowCancellationModal(false);
+    };
+
     return (
-        <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>Edit Auction Listing</DialogTitle>
-          <DialogContent>
-            <TextField label="Auction Title" fullWidth value={editedListing.Auction_Title} name="Auction_Title"
-                       onChange={handleChange} margin="normal"/>
-            <TextField label="Product Name" fullWidth value={editedListing.Product_Name} name="Product_Name"
-                       onChange={handleChange} margin="normal"/>
-            <TextField label="Product Description" fullWidth value={editedListing.Product_Description}
-                       name="Product_Description" onChange={handleChange} margin="normal"/>
+        <>
+          <Dialog open={open} onClose={handleClose}>
+            <DialogTitle>Edit Auction Listing</DialogTitle>
+            <DialogContent>
+              <TextField label="Auction Title" fullWidth value={editedListing.Auction_Title} name="Auction_Title"
+                         onChange={handleChange} margin="normal"/>
+              <TextField label="Product Name" fullWidth value={editedListing.Product_Name} name="Product_Name"
+                         onChange={handleChange} margin="normal"/>
+              <TextField label="Product Description" fullWidth value={editedListing.Product_Description}
+                         name="Product_Description" onChange={handleChange} margin="normal"/>
 
-            <TextField label="Category" fullWidth value={editedListing.Category} name="Category" onChange={handleChange}
-                       margin="normal"/>
-            <TextField label="Quantity" fullWidth value={editedListing.Quantity} name="Quantity" type="number"
-                       onChange={handleChange} margin="normal"/>
-            <TextField label="Reserve Price" fullWidth value={editedListing.Reserve_Price} name="Reserve_Price"
-                       onChange={handleChange} margin="normal"/>
-            <TextField label="Max Bids" fullWidth value={editedListing.Max_bids} name="Max_bids" type="number"
-                       onChange={handleChange} margin="normal"/>
+              <TextField label="Category" fullWidth value={editedListing.Category} name="Category" onChange={handleChange}
+                         margin="normal"/>
+              <TextField label="Quantity" fullWidth value={editedListing.Quantity} name="Quantity" type="number"
+                         onChange={handleChange} margin="normal"/>
+              <TextField label="Reserve Price" fullWidth value={editedListing.Reserve_Price} name="Reserve_Price"
+                         onChange={handleChange} margin="normal"/>
+              <TextField label="Max Bids" fullWidth value={editedListing.Max_bids} name="Max_bids" type="number"
+                         onChange={handleChange} margin="normal"/>
 
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Status</InputLabel>
-              <Select value={editedListing.Status} name="Status" onChange={handleChange}>
-                <MenuItem value={0}>Inactive</MenuItem>
-                <MenuItem value={1}>Active</MenuItem>
-                {/*<MenuItem value={2}>Sold</MenuItem>*/}
-              </Select>
-            </FormControl>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={handleSave} variant="contained">
-              Save
-            </Button>
-          </DialogActions>
-        </Dialog>
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Status</InputLabel>
+                <Select value={editedListing.Status} name="Status" onChange={handleChange}>
+                  <MenuItem value={0}>Inactive</MenuItem>
+                  <MenuItem value={1}>Active</MenuItem>
+                  {/*<MenuItem value={2}>Sold</MenuItem>*/}
+                </Select>
+              </FormControl>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>Cancel</Button>
+              <Button onClick={handleSave} variant="contained">
+                Save
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog open={showCancellationModal} onClose={handleCloseCancellationModal}>
+            <DialogTitle>Cancel Auction</DialogTitle>
+            <DialogContent>
+              <TextField label="Reason for cancellation" fullWidth value={cancellationReason} onChange={(e) => setCancellationReason(e.target.value)} margin="normal" />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseCancellationModal}>Cancel</Button>
+              <Button onClick={handleCancelAuction} variant="contained">Submit</Button>
+            </DialogActions>
+          </Dialog>
+        </>
     );
   };
 
